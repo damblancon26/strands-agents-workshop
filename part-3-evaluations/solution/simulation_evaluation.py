@@ -9,6 +9,15 @@ goals and personas, allowing you to test how your agent handles extended
 conversations without manual intervention.
 """
 
+# The ActorSimulator internally instantiates an Agent (inside its goal_completion tool)
+# without specifying a model, which falls back to Strands' DEFAULT_BEDROCK_MODEL_ID.
+# That default points to a model our IAM role is not authorized to invoke.
+# By overriding DEFAULT_BEDROCK_MODEL_ID before any Agent is created, we make every
+# implicit Agent use our allowed inference profile ARN.
+# Replace <YOUR_INFERENCE_PROFILE_ARN> with the ARN of an inference profile your IAM role can invoke.
+import strands.models.bedrock as _bedrock_mod
+_bedrock_mod.DEFAULT_BEDROCK_MODEL_ID = "<YOUR_INFERENCE_PROFILE_ARN>"
+
 from strands import Agent
 from strands_evals import Case, Experiment, ActorSimulator
 from strands_evals.evaluators import OutputEvaluator
